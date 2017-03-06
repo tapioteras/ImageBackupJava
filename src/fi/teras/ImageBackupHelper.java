@@ -1,6 +1,8 @@
 package fi.teras;
 
 import com.drew.imaging.ImageMetadataReader;
+import com.drew.imaging.ImageProcessingException;
+import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
 import de.vandermeer.asciitable.v2.RenderedTable;
@@ -32,7 +34,17 @@ public class ImageBackupHelper {
                     new AbstractMap.SimpleEntry<>(10, "loka"), new AbstractMap.SimpleEntry<>(11, "marras"), new AbstractMap.SimpleEntry<>(12, "joulu"))
                     .collect(Collectors.toMap((e) -> e.getKey(), (e) -> e.getValue())));
 
-    private boolean isImage(Path path) {
+    public void backupImages(Path from, Path to) throws IOException {
+        System.out.println("from: " + from + ", to: " + to + "\n");
+        Collection<Path> images = getImages(from);
+        images.stream().forEach(imagePath -> {
+            System.out.println("\n\n----- Processing file " + imagePath + "... -----");
+            resolvePathTo(imagePath, to);
+        });
+        printSummary();
+    }
+
+    private boolean isImageOrVideo(Path path) {
         try {
             ImageIO.read(new File(path.toString()));
             return !path.toString().contains(".DS_Store");
@@ -52,30 +64,27 @@ public class ImageBackupHelper {
         }
     }
 
-    public void backupImages(Path from, Path to) throws IOException {
-        System.out.println("from: " + from + ", to: " + to + "\n");
-        Collection<Path> images = getImages(from);
-        images.stream().forEach(imagePath -> {
-            System.out.println("\n\n----- Processing file " + imagePath + "... -----");
-            resolvePathTo(imagePath, to);
-        });
-        printSummary();
+    private String getMonthFolderName(Integer monthNumber, String monthFolderName) {
+        return (monthNumber.toString().length() < 2 ? "0" + monthNumber : monthNumber) + "_" + monthFolderName;
     }
 
     private String resolveMonthPart(int month) {
         return MONTH_FOLDER_NAME_MAP.entrySet()
                 .stream()
                 .filter(e -> e.getKey() == month)
-                .map(e -> (e.getKey().toString().length() < 2 ? "0" + e.getKey() : e.getKey()) + "_" + e.getValue())
+                .map(e -> getMonthFolderName(e.getKey(), e.getValue()))
                 .findFirst()
                 .orElse(null);
     }
 
+    private Directory getFileMimeType(File file) throws ImageProcessingException, IOException {
+        Metadata metadata = ImageMetadataReader.readMetadata(file);
+        return metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
+    }
+
     private Calendar getDateTaken(Path imagePath) {
         try {
-            Metadata metadata = ImageMetadataReader.readMetadata(imagePath.toFile());
-            ExifSubIFDDirectory directory = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
-            Date dateTaken = directory.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
+            Date dateTaken = getFileMimeType(imagePath.toFile()).getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
             Calendar cal = Calendar.getInstance();
             cal.setTime(dateTaken);
             System.out.println("Got date taken " + dateTaken + " / " + imagePath.getFileName());
@@ -163,7 +172,7 @@ public class ImageBackupHelper {
 
     private Collection<Path> getImages(Path from) {
         try {
-            return Files.walk(Paths.get(from.toString())).filter(path -> isImage(path)).collect(Collectors.toSet());
+            return Files.walk(Paths.get(from.toString())).filter(path -> isImageOrVideo(path)).collect(Collectors.toSet());
         } catch (IOException e) {
             return Collections.emptyList();
         }
