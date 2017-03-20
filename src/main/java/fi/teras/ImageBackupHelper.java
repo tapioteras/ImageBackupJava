@@ -53,15 +53,11 @@ public class ImageBackupHelper {
         }
     }
 
-    private void copy(Path from, Path to) {
-        try {
-            if (!Files.exists(to)) {
-                Files.createDirectories(to);
-            }
-            Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
-        } catch (Exception e) {
-            System.out.print("Error copying file " + e);
+    private void copy(Path from, Path to) throws IOException {
+        if (!Files.exists(to)) {
+            Files.createDirectories(to);
         }
+        Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
     }
 
     private String getMonthFolderName(Integer monthNumber, String monthFolderName) {
@@ -107,14 +103,10 @@ public class ImageBackupHelper {
         }
     }
 
-    private void copy(Path to, Integer year, Integer month, Path imagePath) {
-        try {
-            String monthFolderName = resolveMonthPart(month);
-            Path imageTo = Paths.get(to.toString(), year.toString(), monthFolderName, imagePath.getFileName().toString());
-            copy(imagePath, imageTo);
-        } catch (Exception e) {
-            System.out.println("Error copying file with resolving path " + e);
-        }
+    private void copy(Path to, Integer year, Integer month, Path imagePath) throws IOException {
+        String monthFolderName = resolveMonthPart(month);
+        Path imageTo = Paths.get(to.toString(), year.toString(), monthFolderName, imagePath.getFileName().toString());
+        copy(imagePath, imageTo);
     }
 
     private boolean hasDateTaken(Path imagePath) {
