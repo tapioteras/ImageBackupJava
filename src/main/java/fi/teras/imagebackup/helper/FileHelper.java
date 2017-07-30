@@ -55,9 +55,9 @@ public class FileHelper {
             log.debug("Got date taken " + dateTaken + " / " + imagePath.getFileName());
             return cal;
         } catch (ImageProcessingException e) {
-            log.error("Error on image processing when getting date taken", e);
+            //log.error("Error on image processing when getting date taken", e);
         } catch (IOException e) {
-            log.error("IO error on image processing when getting date taken", e);
+            //log.error("IO error on image processing when getting date taken", e);
         }
         return null;
     }
