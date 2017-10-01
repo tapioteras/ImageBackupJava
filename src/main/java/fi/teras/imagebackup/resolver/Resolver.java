@@ -27,10 +27,8 @@ public class Resolver {
         if (FileHelper.hasDateTaken(imagePath)) {
             cal = FileHelper.getDateTaken(imagePath);
         } else if (FileHelper.hasCreationTime(imagePath)) {
-            log.debug("No date taken found, trying to find file created time...");
             cal = FileHelper.getCreationDate(imagePath);
         } else {
-            log.debug("File created time not found");
             throw new NullPointerException("no suitable date found");
         }
         Copier.copy(to, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), imagePath);

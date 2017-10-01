@@ -4,12 +4,13 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class Calculator {
-    public static int getSucceededSize(final List<Path> succeeded) {
-        return succeeded.size() > 0 ? succeeded.size() : 1;
+
+    public final static Double countSuccessPercent(final List<Path> succeeded, final List<Path> failed) {
+        return countSuccessPercent(succeeded.size(), failed.size());
     }
 
-    public static Double countSuccessPercent(final List<Path> succeeded, final List<Path> failed) {
-        int totalCount = succeeded.size() + failed.size();
-        return Double.valueOf(100 * (totalCount - failed.size()) / (double) getSucceededSize(succeeded));
+    public final static Double countSuccessPercent(int succeeded, int failed) {
+        int total = succeeded + failed;
+        return 100 * new Double(total - failed) / new Double(total == 0 ? 1 : total);
     }
 }

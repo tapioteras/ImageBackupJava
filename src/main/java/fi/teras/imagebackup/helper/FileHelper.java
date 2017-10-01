@@ -52,14 +52,11 @@ public class FileHelper {
             dateTaken = getFileMimeType(imagePath.toFile()).getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
             Calendar cal = Calendar.getInstance();
             cal.setTime(dateTaken);
-            log.debug("Got date taken " + dateTaken + " / " + imagePath.getFileName());
             return cal;
-        } catch (ImageProcessingException e) {
-            //log.error("Error on image processing when getting date taken", e);
-        } catch (IOException e) {
-            //log.error("IO error on image processing when getting date taken", e);
+        } catch (Exception e) {
+            log.error("Error on image processing when getting date taken: ", e.getMessage());
+            return null;
         }
-        return null;
     }
 
     public static Calendar getCreationDate(Path filePath) {
@@ -68,7 +65,6 @@ public class FileHelper {
             attr.creationTime().toInstant();
             Calendar cal = Calendar.getInstance();
             cal.setTime(new Date(attr.creationTime().toInstant().toEpochMilli()));
-            log.debug("Got file created time " + attr.creationTime() + " / " + filePath.getFileName());
             return cal;
         } catch (IOException e) {
             log.error("IO error on getting file creation date", e);
