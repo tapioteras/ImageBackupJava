@@ -29,6 +29,7 @@ public class ImageHelper {
                 Resolver.resolvePathTo(imagePath, to);
                 succeeded.add(imagePath);
             } catch (Exception e) {
+                log.error("image (" + imagePath + ") processing failed", e);
                 failed.add(imagePath);
             }
         });

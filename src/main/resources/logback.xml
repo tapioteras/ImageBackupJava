@@ -7,10 +7,9 @@
         </layout>
     </appender>
 
-    <logger name="com.base22" level="TRACE"/>
+    <logger name="fi.teras.imagebackup" level="info"/>
 
-
-    <root level="debug">
+    <root level="info">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>

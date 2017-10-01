@@ -54,7 +54,7 @@ public class FileHelper {
             cal.setTime(dateTaken);
             return cal;
         } catch (Exception e) {
-            log.error("Error on image processing when getting date taken: ", e.getMessage());
+            log.warn("Error on image processing when getting date taken: ", e.getMessage());
             return null;
         }
     }
@@ -67,7 +67,7 @@ public class FileHelper {
             cal.setTime(new Date(attr.creationTime().toInstant().toEpochMilli()));
             return cal;
         } catch (IOException e) {
-            log.error("IO error on getting file creation date", e);
+            log.warn("IO error on getting file creation date", e.getMessage());
         }
         return null;
     }
